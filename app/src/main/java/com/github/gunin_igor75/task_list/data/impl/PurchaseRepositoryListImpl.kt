@@ -5,14 +5,22 @@ import androidx.lifecycle.MutableLiveData
 import com.github.gunin_igor75.task_list.data.exception.PurchaseNotFoundException
 import com.github.gunin_igor75.task_list.domain.pojo.Purchase
 import com.github.gunin_igor75.task_list.domain.repository.PurchaseRepository
+import kotlin.random.Random
 
 object PurchaseRepositoryListImpl : PurchaseRepository {
 
-    private val purchases = mutableListOf<Purchase>()
+    private val purchases = sortedSetOf<Purchase>({ o1, o2 -> o1.id.compareTo(o2.id) })
 
     private val purchasesLD = MutableLiveData<List<Purchase>>()
 
     private var id: Int = 0
+
+    init {
+        for (i in 0 until 100) {
+            val item = Purchase("name $i", i, Random.nextBoolean())
+            addPurchase(item)
+        }
+    }
 
     override fun addPurchase(purchase: Purchase) {
         val purchaseId = purchase.id

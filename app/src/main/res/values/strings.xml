@@ -1,4 +1,9 @@
 <resources>
     <string name="app_name">task_list</string>
     <string name="add_new_purchase">Add new purchase</string>
+    <string name="til_name">Name</string>
+    <string name="te_count">Count</string>
+    <string name="button_save">SAVE</string>
+    <string name="error_name">Invalid name</string>
+    <string name="error_count">Invalid count</string>
 </resources>
