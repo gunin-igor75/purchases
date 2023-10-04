@@ -16,7 +16,7 @@ object PurchaseRepositoryListImpl : PurchaseRepository {
     private var id: Int = 0
 
     init {
-        for (i in 0 until 100) {
+        for (i in 0 until 10) {
             val item = Purchase("name $i", i, Random.nextBoolean())
             addPurchase(item)
         }

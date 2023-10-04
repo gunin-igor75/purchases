@@ -2,9 +2,13 @@ package com.github.gunin_igor75.task_list.presentation
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.Toast
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentContainerView
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
+import com.github.gunin_igor75.task_list.R
 import com.github.gunin_igor75.task_list.databinding.ActivityMainBinding
 import com.github.gunin_igor75.task_list.presentation.adapter.PurchaseAdapter
 import com.github.gunin_igor75.task_list.presentation.adapter.PurchaseAdapter.Companion.MAX_POOL_SIZE
@@ -12,7 +16,7 @@ import com.github.gunin_igor75.task_list.presentation.adapter.PurchaseAdapter.Co
 import com.github.gunin_igor75.task_list.presentation.adapter.PurchaseAdapter.Companion.VIEW_TYPE_ENABLE
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), PurchaseItemFragment.OnFinishedListener {
 
     private lateinit var viewModel: MainViewModel
 
@@ -24,16 +28,23 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var btAddPurchase: FloatingActionButton
 
+    private var purchaseItemContainer:FragmentContainerView? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
         initView()
         viewModel = ViewModelProvider(this)[MainViewModel::class.java]
         setupRecyclerView()
         observeViewModel()
         setupFloatingActionButton()
+    }
+
+    private fun initView() {
+        rvPurchases = binding.rvPurchases
+        btAddPurchase = binding.btAddPurchase
+        purchaseItemContainer  = binding.purchaseItemContainer
     }
 
     private fun observeViewModel() {
@@ -42,15 +53,16 @@ class MainActivity : AppCompatActivity() {
 
     private fun setupFloatingActionButton() {
         btAddPurchase.setOnClickListener{
-            val intent = PurchaseItemActivity.newIntent(this)
-            startActivity(intent)
+            if (isOnePaneMode()) {
+                val intent = PurchaseItemActivity.newIntent(this)
+                startActivity(intent)
+            } else {
+                val fragment = PurchaseItemFragment.newInstanceAddItem()
+                launchFragmentMode(fragment)
+            }
         }
     }
 
-    private fun initView() {
-        rvPurchases = binding.rvPurchases
-        btAddPurchase = binding.btAddPurchase
-    }
     private fun setupRecyclerView() {
         purchaseAdapter = PurchaseAdapter()
         with(rvPurchases) {
@@ -69,8 +81,13 @@ class MainActivity : AppCompatActivity() {
 
     private fun setupClickListener() {
         purchaseAdapter.purchaseOnclickListener = {
-            val intent = PurchaseItemActivity.newIntent(this, it.id)
-            startActivity(intent)
+            if (isOnePaneMode()) {
+                val intent = PurchaseItemActivity.newIntent(this, it.id)
+                startActivity(intent)
+            } else {
+                val fragment = PurchaseItemFragment.newInstanceUpdateItem(it.id)
+                launchFragmentMode(fragment)
+            }
         }
     }
 
@@ -95,5 +112,22 @@ class MainActivity : AppCompatActivity() {
         }
         val itemTouchHelper = ItemTouchHelper(calBack)
         itemTouchHelper.attachToRecyclerView(rvPurchases)
+    }
+
+    private fun isOnePaneMode(): Boolean {
+        return purchaseItemContainer == null
+    }
+
+    private fun launchFragmentMode(fragment: Fragment) {
+        supportFragmentManager.popBackStack()
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.purchase_item_container, fragment)
+            .addToBackStack(null)
+            .commit()
+    }
+
+    override fun onFinished() {
+        Toast.makeText(this, "Success", Toast.LENGTH_SHORT).show()
+        supportFragmentManager.popBackStack()
     }
 }
