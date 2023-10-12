@@ -1,6 +1,5 @@
 package com.github.gunin_igor75.task_list.presentation
 
-import android.app.Activity
 import android.content.Context
 import android.os.Bundle
 import android.text.Editable
@@ -11,7 +10,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import com.github.gunin_igor75.task_list.R
+import com.github.gunin_igor75.task_list.databinding.FragmentPurchaseItemBinding
 import com.github.gunin_igor75.task_list.domain.pojo.Purchase.Companion.NOTING_VALUE
 import com.github.gunin_igor75.task_list.presentation.PurchaseItemActivity.Companion.MODE
 import com.github.gunin_igor75.task_list.presentation.PurchaseItemActivity.Companion.MODE_ADD
@@ -19,19 +18,21 @@ import com.github.gunin_igor75.task_list.presentation.PurchaseItemActivity.Compa
 import com.github.gunin_igor75.task_list.presentation.PurchaseItemActivity.Companion.PURCHASE_ID
 import com.github.gunin_igor75.task_list.presentation.PurchaseItemActivity.Companion.UNKNOWN_TYPE
 import com.google.android.material.textfield.TextInputEditText
-import com.google.android.material.textfield.TextInputLayout
 
 class PurchaseItemFragment : Fragment() {
 
-    private lateinit var tilName: TextInputLayout
     private lateinit var edName: TextInputEditText
-    private lateinit var tilount: TextInputLayout
     private lateinit var edCount: TextInputEditText
     private lateinit var btSave: Button
     private lateinit var viewModel: PurchaseItemViewModel
     private lateinit var onFinishedListener: OnFinishedListener
     private var typeScreen: String = UNKNOWN_TYPE
     private var purchaseId: Int = NOTING_VALUE
+    private var _binding: FragmentPurchaseItemBinding? = null
+    private val binding
+        get() = _binding ?: throw RuntimeException("FragmentPurchaseItemBinding is null")
+
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,8 +43,9 @@ class PurchaseItemFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_purchase_item, container, false)
+    ): View {
+        _binding = FragmentPurchaseItemBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onAttach(context: Context) {
@@ -59,7 +61,7 @@ class PurchaseItemFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(this)[PurchaseItemViewModel::class.java]
-        initViews(view)
+        initViews()
         launchMode()
         observeViewModel()
         addTextChangeListeners()
@@ -84,12 +86,12 @@ class PurchaseItemFragment : Fragment() {
         }
     }
 
-    private fun initViews(view: View) {
-        tilName = view.findViewById(R.id.til_name)
-        edName = view.findViewById(R.id.ed_name)
-        tilount = view.findViewById(R.id.til_count)
-        edCount = view.findViewById(R.id.ed_count)
-        btSave = view.findViewById(R.id.bt_save)
+    private fun initViews() {
+        edName = binding.edName
+        edCount = binding.edCount
+        btSave = binding.btSave
+        binding.viewModel = viewModel
+        binding.lifecycleOwner = viewLifecycleOwner
     }
 
     private fun launchMode() {
@@ -107,27 +109,15 @@ class PurchaseItemFragment : Fragment() {
 
     private fun launchUpdateMode() {
         viewModel.getPurchase(purchaseId)
-        viewModel.purchase.observe(this) {
-            edName.setText(it.name)
-            edCount.setText(it.count.toString())
-        }
         btSave.setOnClickListener {
-            viewModel.updatePurchase(edName.text?.toString(), edCount.text?.toString())
+            viewModel.updatePurchase(
+                edName.text?.toString(),
+                edCount.text?.toString()
+            )
         }
     }
 
-
     private fun observeViewModel() {
-        viewModel.errorInputName.observe(viewLifecycleOwner) {
-            val message = if (it) getString(R.string.error_name) else null
-            tilName.error = message
-        }
-
-        viewModel.errorInputCount.observe(viewLifecycleOwner) {
-            val message = if (it) getString(R.string.error_count) else null
-            tilount.error = message
-        }
-
         viewModel.closeScreen.observe(viewLifecycleOwner) {
             onFinishedListener.onFinished()
         }
