@@ -7,7 +7,7 @@ data class Purchase(
     var id: Int = NOTING_VALUE
 ) {
     companion object{
-        const val NOTING_VALUE = -1
+        const val NOTING_VALUE = 0
     }
 }
 

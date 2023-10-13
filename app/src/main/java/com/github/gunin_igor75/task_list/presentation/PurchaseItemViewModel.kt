@@ -1,10 +1,11 @@
 package com.github.gunin_igor75.task_list.presentation
 
+import android.app.Application
 import android.util.Log
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import com.github.gunin_igor75.task_list.data.impl.PurchaseRepositoryListImpl
+import com.github.gunin_igor75.task_list.data.impl.PurchaseRepositoryDBImp
 import com.github.gunin_igor75.task_list.domain.pojo.Purchase
 import com.github.gunin_igor75.task_list.domain.usecase.AddPurchaseUseCase
 import com.github.gunin_igor75.task_list.domain.usecase.GetPurchaseByIdUseCase
@@ -12,9 +13,9 @@ import com.github.gunin_igor75.task_list.domain.usecase.UpdatePurchaseUseCase
 
 const val TAG = "PurchaseItemViewModel"
 
-class PurchaseItemViewModel : ViewModel() {
+class PurchaseItemViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val purchaseRepository = PurchaseRepositoryListImpl
+    private val purchaseRepository = PurchaseRepositoryDBImp(application)
     private val addPurchaseUseCase = AddPurchaseUseCase(purchaseRepository)
     private val getPurchaseByIdUseCase = GetPurchaseByIdUseCase(purchaseRepository)
     private val updatePurchaseUseCase = UpdatePurchaseUseCase(purchaseRepository)
