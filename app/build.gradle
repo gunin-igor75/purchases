@@ -39,7 +39,7 @@ android {
 }
 
 dependencies {
-    def room_version = "2.5.2"
+    def room_version = "2.6.0"
     def lifecycle_version = "2.6.2"
 
     implementation 'androidx.core:core-ktx:1.12.0'
@@ -56,6 +56,9 @@ dependencies {
 
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"
     implementation "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycle_version"
+
+    implementation 'com.google.dagger:dagger:2.48.1'
+    kapt 'com.google.dagger:dagger-compiler:2.48.1'
 
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'

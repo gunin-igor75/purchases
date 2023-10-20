@@ -1,24 +1,24 @@
 package com.github.gunin_igor75.task_list.presentation
 
-import android.app.Application
 import android.util.Log
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.github.gunin_igor75.task_list.data.impl.PurchaseRepositoryDBImp
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.github.gunin_igor75.task_list.domain.pojo.Purchase
 import com.github.gunin_igor75.task_list.domain.usecase.AddPurchaseUseCase
 import com.github.gunin_igor75.task_list.domain.usecase.GetPurchaseByIdUseCase
 import com.github.gunin_igor75.task_list.domain.usecase.UpdatePurchaseUseCase
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-const val TAG = "PurchaseItemViewModel"
+private const val TAG = "PurchaseItemViewModel"
 
-class PurchaseItemViewModel(application: Application) : AndroidViewModel(application) {
-
-    private val purchaseRepository = PurchaseRepositoryDBImp(application)
-    private val addPurchaseUseCase = AddPurchaseUseCase(purchaseRepository)
-    private val getPurchaseByIdUseCase = GetPurchaseByIdUseCase(purchaseRepository)
-    private val updatePurchaseUseCase = UpdatePurchaseUseCase(purchaseRepository)
+class PurchaseItemViewModel @Inject constructor(
+    private val addPurchaseUseCase: AddPurchaseUseCase,
+    private val getPurchaseByIdUseCase: GetPurchaseByIdUseCase,
+    private val updatePurchaseUseCase: UpdatePurchaseUseCase
+) : ViewModel() {
 
     private var _errorInputName = MutableLiveData<Boolean>()
     val errorInputName: LiveData<Boolean>
@@ -42,8 +42,10 @@ class PurchaseItemViewModel(application: Application) : AndroidViewModel(applica
         val isValidation = validateInput(name, count)
         if (isValidation) {
             val purchase = Purchase(name, count, true)
-            addPurchaseUseCase.addPurchase(purchase)
-            finishWork()
+            viewModelScope.launch {
+                addPurchaseUseCase.addPurchase(purchase)
+                finishWork()
+            }
         }
     }
 
@@ -55,15 +57,19 @@ class PurchaseItemViewModel(application: Application) : AndroidViewModel(applica
             val item = _purchase.value
             item?.let {
                 val purchase = it.copy(name = name, count = count)
-                updatePurchaseUseCase.updatePurchase(purchase)
-                finishWork()
+                viewModelScope.launch {
+                    updatePurchaseUseCase.updatePurchase(purchase)
+                    finishWork()
+                }
             }
         }
     }
 
     fun getPurchase(purchaseId: Int) {
-        val item = getPurchaseByIdUseCase.getPurchaseById(purchaseId)
-        _purchase.value = item
+        viewModelScope.launch {
+            val item = getPurchaseByIdUseCase.getPurchaseById(purchaseId)
+            _purchase.value = item
+        }
     }
 
     fun resetErrorInputName() {

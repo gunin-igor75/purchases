@@ -9,11 +9,16 @@ import com.github.gunin_igor75.task_list.domain.pojo.Purchase.Companion.NOTING_V
 
 class PurchaseItemActivity : AppCompatActivity(), PurchaseItemFragment.OnFinishedListener {
 
+    private val component by lazy {
+        (application as PurchaseApp).component
+    }
+
     private var typeScreen = UNKNOWN_TYPE
 
     private var purchaseId = NOTING_VALUE
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        component.inject(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_purchase_item)
         parseIntent()

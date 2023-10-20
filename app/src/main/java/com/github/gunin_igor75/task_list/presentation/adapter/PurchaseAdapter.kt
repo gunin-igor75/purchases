@@ -10,8 +10,10 @@ import com.github.gunin_igor75.task_list.R
 import com.github.gunin_igor75.task_list.databinding.PurchaseItemEnableBinding
 import com.github.gunin_igor75.task_list.databinding.PurchesItemDisableBinding
 import com.github.gunin_igor75.task_list.domain.pojo.Purchase
+import javax.inject.Inject
 
-class PurchaseAdapter : ListAdapter<Purchase, PurchaseItemViewHolder>(PurchaseItemDiffCallback()) {
+class PurchaseAdapter @Inject constructor() :
+    ListAdapter<Purchase, PurchaseItemViewHolder>(PurchaseItemDiffCallback()) {
 
     var purchaseOnLongClickListener: ((Purchase) -> Unit)? = null
 
@@ -46,6 +48,7 @@ class PurchaseAdapter : ListAdapter<Purchase, PurchaseItemViewHolder>(PurchaseIt
             is PurchaseItemEnableBinding -> {
                 binding.purchase = purchase
             }
+
             is PurchesItemDisableBinding -> {
                 binding.purchase = purchase
             }

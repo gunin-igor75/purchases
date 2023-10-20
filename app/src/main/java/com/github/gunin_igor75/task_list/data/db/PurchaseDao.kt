@@ -6,7 +6,6 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.github.gunin_igor75.task_list.data.entity.PurchaseDbModel
-import com.github.gunin_igor75.task_list.domain.pojo.Purchase
 
 @Dao
 interface PurchaseDao {
@@ -15,12 +14,12 @@ interface PurchaseDao {
     fun getPurchases(): LiveData<List<PurchaseDbModel>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun addPurchase(purchaseDbModel: PurchaseDbModel)
+    suspend fun addPurchase(purchaseDbModel: PurchaseDbModel)
 
     @Query("DELETE FROM purchases WHERE id =:purchaseId")
-    fun deletePurchase(purchaseId: Int)
+    suspend fun deletePurchase(purchaseId: Int)
 
     @Query("SELECT * FROM purchases WHERE id =:purchaseId LIMIT 1")
-    fun getPurchaseById(purchaseId: Int): PurchaseDbModel
+    suspend fun getPurchaseById(purchaseId: Int): PurchaseDbModel
 
 }

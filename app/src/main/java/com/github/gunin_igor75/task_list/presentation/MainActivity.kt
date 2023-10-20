@@ -15,12 +15,21 @@ import com.github.gunin_igor75.task_list.presentation.adapter.PurchaseAdapter.Co
 import com.github.gunin_igor75.task_list.presentation.adapter.PurchaseAdapter.Companion.VIEW_TYPE_DISABLE
 import com.github.gunin_igor75.task_list.presentation.adapter.PurchaseAdapter.Companion.VIEW_TYPE_ENABLE
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import javax.inject.Inject
 
 class MainActivity : AppCompatActivity(), PurchaseItemFragment.OnFinishedListener {
 
-    private lateinit var viewModel: MainViewModel
+    @Inject
+    lateinit var purchaseAdapter: PurchaseAdapter
 
-    private lateinit var purchaseAdapter: PurchaseAdapter
+    @Inject
+    lateinit var viewModelFactory: ViewModelFactory
+
+    private val component by lazy {
+        (application as PurchaseApp).component
+    }
+
+    private lateinit var viewModel: MainViewModel
 
     private lateinit var binding: ActivityMainBinding
 
@@ -31,11 +40,12 @@ class MainActivity : AppCompatActivity(), PurchaseItemFragment.OnFinishedListene
     private var purchaseItemContainer:FragmentContainerView? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        component.inject(this)
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         initView()
-        viewModel = ViewModelProvider(this)[MainViewModel::class.java]
+        viewModel = ViewModelProvider(this, viewModelFactory)[MainViewModel::class.java]
         setupRecyclerView()
         observeViewModel()
         setupFloatingActionButton()
@@ -64,7 +74,6 @@ class MainActivity : AppCompatActivity(), PurchaseItemFragment.OnFinishedListene
     }
 
     private fun setupRecyclerView() {
-        purchaseAdapter = PurchaseAdapter()
         with(rvPurchases) {
             adapter = purchaseAdapter
             recycledViewPool.setMaxRecycledViews(VIEW_TYPE_ENABLE, MAX_POOL_SIZE)

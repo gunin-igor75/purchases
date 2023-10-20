@@ -18,20 +18,27 @@ import com.github.gunin_igor75.task_list.presentation.PurchaseItemActivity.Compa
 import com.github.gunin_igor75.task_list.presentation.PurchaseItemActivity.Companion.PURCHASE_ID
 import com.github.gunin_igor75.task_list.presentation.PurchaseItemActivity.Companion.UNKNOWN_TYPE
 import com.google.android.material.textfield.TextInputEditText
+import javax.inject.Inject
 
 class PurchaseItemFragment : Fragment() {
 
+    @Inject
+    lateinit var viewModelFactory: ViewModelFactory
+
+    private val component by lazy {
+        (requireActivity().application as PurchaseApp).component
+    }
+
+    private lateinit var viewModel: PurchaseItemViewModel
     private lateinit var edName: TextInputEditText
     private lateinit var edCount: TextInputEditText
     private lateinit var btSave: Button
-    private lateinit var viewModel: PurchaseItemViewModel
     private lateinit var onFinishedListener: OnFinishedListener
     private var typeScreen: String = UNKNOWN_TYPE
     private var purchaseId: Int = NOTING_VALUE
     private var _binding: FragmentPurchaseItemBinding? = null
     private val binding
         get() = _binding ?: throw RuntimeException("FragmentPurchaseItemBinding is null")
-
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -49,18 +56,20 @@ class PurchaseItemFragment : Fragment() {
     }
 
     override fun onAttach(context: Context) {
+        component.inject(this)
         super.onAttach(context)
         if (context is OnFinishedListener) {
             onFinishedListener = context
         } else {
             throw RuntimeException(
-                "Activity mast implement interface PurchaseItemFragment.OnFinishedListener")
+                "Activity mast implement interface PurchaseItemFragment.OnFinishedListener"
+            )
         }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel = ViewModelProvider(this)[PurchaseItemViewModel::class.java]
+        viewModel = ViewModelProvider(this, viewModelFactory)[PurchaseItemViewModel::class.java]
         initViews()
         launchMode()
         observeViewModel()

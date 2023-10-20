@@ -1,29 +1,34 @@
 package com.github.gunin_igor75.task_list.presentation
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
-import com.github.gunin_igor75.task_list.data.impl.PurchaseRepositoryDBImp
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.github.gunin_igor75.task_list.domain.pojo.Purchase
 import com.github.gunin_igor75.task_list.domain.usecase.DeletePurchaseUseCase
 import com.github.gunin_igor75.task_list.domain.usecase.GetPurchasesUseCase
 import com.github.gunin_igor75.task_list.domain.usecase.UpdatePurchaseUseCase
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class MainViewModel(application: Application): AndroidViewModel(application) {
+class MainViewModel @Inject constructor(
+    getPurchasesUseCase: GetPurchasesUseCase,
+    private val deletePurchaseUseCase: DeletePurchaseUseCase,
+    private val updatePurchaseUseCase: UpdatePurchaseUseCase
+) : ViewModel() {
 
-    private val purchaseRepository = PurchaseRepositoryDBImp(application)
-
-    private val getPurchasesUseCase = GetPurchasesUseCase(purchaseRepository)
-    private val deletePurchaseUseCase = DeletePurchaseUseCase(purchaseRepository)
-    private val updatePurchaseUseCase = UpdatePurchaseUseCase(purchaseRepository)
 
     val purchases = getPurchasesUseCase.getPurchases()
 
+
     fun deletePurchase(purchase: Purchase) {
-        deletePurchaseUseCase.deletePurchase(purchase)
+        viewModelScope.launch {
+            deletePurchaseUseCase.deletePurchase(purchase)
+        }
     }
 
     fun changeEnablePurchases(purchase: Purchase) {
         val newPurchases = purchase.copy(enabled = !purchase.enabled)
-        updatePurchaseUseCase.updatePurchase(newPurchases)
+        viewModelScope.launch {
+            updatePurchaseUseCase.updatePurchase(newPurchases)
+        }
     }
 }

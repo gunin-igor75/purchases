@@ -2,8 +2,9 @@ package com.github.gunin_igor75.task_list.data.mapper
 
 import com.github.gunin_igor75.task_list.data.entity.PurchaseDbModel
 import com.github.gunin_igor75.task_list.domain.pojo.Purchase
+import javax.inject.Inject
 
-class PurchaseMapper {
+class PurchaseMapper @Inject constructor(){
 
     fun purchaseToPurchaseDbModel(purchase: Purchase) = PurchaseDbModel(
         id = purchase.id,
