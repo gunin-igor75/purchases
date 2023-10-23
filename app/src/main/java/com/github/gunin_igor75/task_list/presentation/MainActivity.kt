@@ -1,8 +1,8 @@
 package com.github.gunin_igor75.task_list.presentation
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentContainerView
 import androidx.lifecycle.ViewModelProvider
@@ -16,6 +16,7 @@ import com.github.gunin_igor75.task_list.presentation.adapter.PurchaseAdapter.Co
 import com.github.gunin_igor75.task_list.presentation.adapter.PurchaseAdapter.Companion.VIEW_TYPE_ENABLE
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import javax.inject.Inject
+
 
 class MainActivity : AppCompatActivity(), PurchaseItemFragment.OnFinishedListener {
 
@@ -37,7 +38,7 @@ class MainActivity : AppCompatActivity(), PurchaseItemFragment.OnFinishedListene
 
     private lateinit var btAddPurchase: FloatingActionButton
 
-    private var purchaseItemContainer:FragmentContainerView? = null
+    private var purchaseItemContainer: FragmentContainerView? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         component.inject(this)
@@ -49,12 +50,13 @@ class MainActivity : AppCompatActivity(), PurchaseItemFragment.OnFinishedListene
         setupRecyclerView()
         observeViewModel()
         setupFloatingActionButton()
+
     }
 
     private fun initView() {
         rvPurchases = binding.rvPurchases
         btAddPurchase = binding.btAddPurchase
-        purchaseItemContainer  = binding.purchaseItemContainer
+        purchaseItemContainer = binding.purchaseItemContainer
     }
 
     private fun observeViewModel() {
@@ -62,7 +64,7 @@ class MainActivity : AppCompatActivity(), PurchaseItemFragment.OnFinishedListene
     }
 
     private fun setupFloatingActionButton() {
-        btAddPurchase.setOnClickListener{
+        btAddPurchase.setOnClickListener {
             if (isOnePaneMode()) {
                 val intent = PurchaseItemActivity.newIntent(this)
                 startActivity(intent)

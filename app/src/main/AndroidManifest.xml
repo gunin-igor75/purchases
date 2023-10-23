@@ -25,6 +25,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <provider
+            android:authorities="com.github.gunin_igor75.task_list"
+            android:name=".data.provider.PurchaseProvider"
+            android:exported="true"/>
     </application>
 
 </manifest>

@@ -12,11 +12,13 @@ import dagger.Provides
 @Module
 interface DataModule {
 
+    @AppScope
     @Binds
     fun bindsPurchaseRepository(impl: PurchaseRepositoryDBImp): PurchaseRepository
 
     companion object{
 
+        @AppScope
         @Provides
         fun providesDatabase(application: Application): PurchaseDao {
             return PurchaseDataBase.getInstance(application).purchaseDao()
