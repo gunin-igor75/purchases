@@ -3,40 +3,28 @@ package com.github.gunin_igor75.task_list.presentation
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
-import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.ViewModelProvider
 import com.github.gunin_igor75.task_list.R
-import com.github.gunin_igor75.task_list.databinding.ActivityPurchaseItemBinding
 import com.github.gunin_igor75.task_list.domain.pojo.Purchase.Companion.NOTING_VALUE
-import com.google.android.material.textfield.TextInputEditText
-import com.google.android.material.textfield.TextInputLayout
 
-class PurchaseItemActivity : AppCompatActivity() {
+class PurchaseItemActivity : AppCompatActivity(), PurchaseItemFragment.OnFinishedListener {
 
-    private lateinit var binding: ActivityPurchaseItemBinding
-    private lateinit var tilName: TextInputLayout
-    private lateinit var edName: TextInputEditText
-    private lateinit var tilount: TextInputLayout
-    private lateinit var edCount: TextInputEditText
-    private lateinit var btSave: Button
-    private lateinit var viewModel: PurchaseItemViewModel
+    private val component by lazy {
+        (application as PurchaseApp).component
+    }
+
     private var typeScreen = UNKNOWN_TYPE
+
     private var purchaseId = NOTING_VALUE
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        component.inject(this)
         super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_purchase_item)
         parseIntent()
-        binding = ActivityPurchaseItemBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-        initViews()
-        viewModel = ViewModelProvider(this)[PurchaseItemViewModel::class.java]
-
-        launchMode()
-        observeViewModel()
-        addTextChangeListeners()
+        if (savedInstanceState == null) {
+            launchMode()
+        }
     }
 
     private fun parseIntent() {
@@ -54,78 +42,15 @@ class PurchaseItemActivity : AppCompatActivity() {
         typeScreen = mode
         purchaseId = intentCurrent.getIntExtra(PURCHASE_ID, NOTING_VALUE)
     }
-
-    private fun initViews() {
-        tilName = binding.tilName
-        edName = binding.edName
-        tilount = binding.tilCount
-        edCount = binding.edCount
-        btSave = binding.btSave
-    }
-
     private fun launchMode() {
-        when (typeScreen) {
-            MODE_ADD -> launchAddMode();
-            MODE_UPDATE -> launchUpdateMode()
+        val fragment = when (typeScreen) {
+            MODE_ADD -> PurchaseItemFragment.newInstanceAddItem();
+            MODE_UPDATE -> PurchaseItemFragment.newInstanceUpdateItem(purchaseId)
+            else -> throw RuntimeException("Unknown type $typeScreen")
         }
-    }
-
-    private fun launchUpdateMode() {
-        viewModel.getPurchase(purchaseId)
-        viewModel.purchase.observe(this){
-            edName.setText(it.name)
-            edCount.setText(it.count.toString())
-        }
-        btSave.setOnClickListener {
-            viewModel.updatePurchase(edName.text?.toString(), edCount.text?.toString())
-        }
-    }
-
-    private fun launchAddMode() {
-       btSave.setOnClickListener {
-           viewModel.addPurchase(edName.text?.toString(), edCount.text?.toString())
-       }
-    }
-
-    private fun observeViewModel() {
-        viewModel.errorInputName.observe(this){
-            val message = if (it) getString(R.string.error_name) else null
-            tilName.error = message
-        }
-
-        viewModel.errorInputCount.observe(this){
-            val message = if (it) getString(R.string.error_count) else null
-            tilount.error = message
-        }
-
-        viewModel.closeScreen.observe(this){
-            finish()
-        }
-    }
-
-    private fun addTextChangeListeners() {
-        edName.addTextChangedListener(object :TextWatcher{
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-            }
-
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                viewModel.resetErrorInputName()
-            }
-
-            override fun afterTextChanged(s: Editable?) {
-            }
-        })
-        edCount.addTextChangedListener(object :TextWatcher{
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-            }
-
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                viewModel.resetErrorInputCount()
-            }
-
-            override fun afterTextChanged(s: Editable?) {
-            }
-        })
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.purchase_item_container,fragment)
+            .commit()
     }
 
     companion object {
@@ -148,5 +73,9 @@ class PurchaseItemActivity : AppCompatActivity() {
             intent.putExtra(PURCHASE_ID, purchaseId)
             return intent
         }
+    }
+
+    override fun onFinished() {
+        finish()
     }
 }
