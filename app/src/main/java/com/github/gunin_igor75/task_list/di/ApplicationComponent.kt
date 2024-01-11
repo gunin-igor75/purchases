@@ -1,6 +1,7 @@
 package com.github.gunin_igor75.task_list.di
 
 import android.app.Application
+import android.content.Context
 import com.github.gunin_igor75.task_list.data.provider.PurchaseProvider
 import com.github.gunin_igor75.task_list.presentation.MainActivity
 import com.github.gunin_igor75.task_list.presentation.PurchaseItemActivity
@@ -30,7 +31,7 @@ interface ApplicationComponent {
     interface ApplicationComponentFactory {
 
         fun create(
-            @BindsInstance application: Application
+            @BindsInstance applicationContext: Context
         ): ApplicationComponent
     }
 }

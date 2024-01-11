@@ -5,7 +5,10 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentContainerView
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.github.gunin_igor75.task_list.R
@@ -15,6 +18,8 @@ import com.github.gunin_igor75.task_list.presentation.adapter.PurchaseAdapter.Co
 import com.github.gunin_igor75.task_list.presentation.adapter.PurchaseAdapter.Companion.VIEW_TYPE_DISABLE
 import com.github.gunin_igor75.task_list.presentation.adapter.PurchaseAdapter.Companion.VIEW_TYPE_ENABLE
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 
@@ -60,7 +65,13 @@ class MainActivity : AppCompatActivity(), PurchaseItemFragment.OnFinishedListene
     }
 
     private fun observeViewModel() {
-        viewModel.purchases.observe(this) { purchaseAdapter.submitList(it) }
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                viewModel.purchases().collect {
+                    purchaseAdapter.submitList(it)
+                }
+            }
+        }
     }
 
     private fun setupFloatingActionButton() {

@@ -7,12 +7,13 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.github.gunin_igor75.task_list.data.entity.PurchaseDbModel
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface PurchaseDao {
 
     @Query("SELECT * FROM purchases ORDER BY id")
-    fun getPurchases(): LiveData<List<PurchaseDbModel>>
+    fun getPurchases(): Flow<List<PurchaseDbModel>>
 
     @Query("SELECT * FROM purchases ORDER BY id")
     fun getPurchasesCursor(): Cursor

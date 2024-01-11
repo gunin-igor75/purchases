@@ -1,6 +1,7 @@
 package com.github.gunin_igor75.task_list.data.db
 
 import android.app.Application
+import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
@@ -18,13 +19,13 @@ abstract class PurchaseDataBase : RoomDatabase() {
 
         private var instance: PurchaseDataBase? = null
 
-        fun getInstance(application: Application): PurchaseDataBase {
+        fun getInstance(applicationContext: Context): PurchaseDataBase {
             instance?.let {
                 return it
             }
             synchronized(LOCK) {
                 val db = Room.databaseBuilder(
-                    application,
+                    applicationContext,
                     PurchaseDataBase::class.java,
                     DB_NAME
                 ).build()

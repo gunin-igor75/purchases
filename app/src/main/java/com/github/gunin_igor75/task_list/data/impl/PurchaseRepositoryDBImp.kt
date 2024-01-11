@@ -1,11 +1,11 @@
 package com.github.gunin_igor75.task_list.data.impl
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.map
 import com.github.gunin_igor75.task_list.data.db.PurchaseDao
 import com.github.gunin_igor75.task_list.data.mapper.PurchaseMapper
 import com.github.gunin_igor75.task_list.domain.pojo.Purchase
 import com.github.gunin_igor75.task_list.domain.repository.PurchaseRepository
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class PurchaseRepositoryDBImp @Inject constructor(
@@ -28,8 +28,9 @@ class PurchaseRepositoryDBImp @Inject constructor(
         return mapper.purchaseDbModelToPurchase(purchaseDbModel)
     }
 
-    override fun getPurchases(): LiveData<List<Purchase>> {
-        return purchaseDao.getPurchases().map { mapper.purchasesDBModelToPurchases(it) }
+    override suspend fun getPurchases(): Flow<List<Purchase>> {
+        return purchaseDao.getPurchases()
+            .map { mapper.purchasesDBModelToPurchases(it) }
     }
 
     override suspend fun updatePurchase(purchase: Purchase) {
